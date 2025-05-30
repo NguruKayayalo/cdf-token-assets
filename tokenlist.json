@@ -1,0 +1,21 @@
+{
+  "name": "CDF Token List",
+  "logoURI": "https://gateway.pinata.cloud/ipfs/bafybeic5xs67aevywk7iwna4i25p7mtccsexcz7umem6gqhblhvncqm5ay",
+  "keywords": ["cdf", "congo", "token"],
+  "timestamp": "2025-05-30T00:00:00+00:00",
+  "tokens": [
+    {
+      "chainId": 56,
+      "address": "0x0C0f43ace39efFf9F938EFF07D660dB32a3C16af",
+      "name": "Franc Congolais",
+      "symbol": "CDF",
+      "decimals": 18,
+      "logoURI": "https://gateway.pinata.cloud/ipfs/bafybeic5xs67aevywk7iwna4i25p7mtccsexcz7umem6gqhblhvncqm5ay"
+    }
+  ],
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  }
+}
