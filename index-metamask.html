@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>CDF Token - Acheter / Vendre</title>
+  <style>
+    body {
+      font-family: "Times New Roman", Times, serif;
+      background-color: #f5f5f5;
+      color: #222;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+    .token-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 30px;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+    }
+    .token-logo {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 20px;
+      border-radius: 50%;
+    }
+    input {
+      margin-top: 20px;
+      padding: 10px;
+      font-size: 16px;
+      width: 80%;
+      font-family: "Times New Roman", Times, serif;
+    }
+    button {
+      margin-top: 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      font-family: "Times New Roman", Times, serif;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .address {
+      font-family: monospace;
+      font-size: 14px;
+      color: #444;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div class="token-container">
+    <img src="https://gateway.pinata.cloud/ipfs/bafybeic5xs67aevywk7iwna4i25p7mtccsexcz7umem6gqhblhvncqm5ay" class="token-logo" alt="CDF Logo">
+    <h2>Franc Congolais (CDF)</h2>
+    <p><strong>Réseau :</strong> Binance Smart Chain</p>
+    <p><strong>Contrat Token :</strong></p>
+    <p class="address">0x0C0f43ace39efFf9F938EFF07D660dB32a3C16af</p>
+    <p><strong>Contrat Vendor :</strong></p>
+    <p class="address">0xYourVendorContractAddress</p>
+    <p><strong>Taux :</strong> 1 BNB = 6 720 000 CDF</p>
+
+    <input type="number" id="bnbAmount" placeholder="Montant BNB à échanger">
+    <button onclick="buyToken()">Acheter des CDF</button>
+
+    <hr style="margin: 40px 0; width: 80%;">
+
+    <input type="number" id="cdfAmount" placeholder="Montant CDF à vendre">
+    <button onclick="sellToken()">Vendre des CDF</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
+  <script>
+    const tokenAddress = "0x0C0f43ace39efFf9F938EFF07D660dB32a3C16af";
+    const vendorAddress = "0xYourVendorContractAddress"; // à remplacer
+    const tokenABI = [ // Simplifié
+      "function approve(address spender, uint256 amount) public returns (bool)",
+      "function decimals() public view returns (uint8)"
+    ];
+    const vendorABI = [
+      "function buyTokens() public payable",
+      "function sellTokens(uint256 tokenAmount) public"
+    ];
+
+    async function buyToken() {
+      const bnbAmount = document.getElementById("bnbAmount").value;
+      if (!window.ethereum) return alert("Installez Metamask !");
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+
+      const tx = await signer.sendTransaction({
+        to: vendorAddress,
+        value: ethers.utils.parseEther(bnbAmount)
+      });
+
+      alert("Transaction envoyée: " + tx.hash);
+    }
+
+    async function sellToken() {
+      const cdfAmount = document.getElementById("cdfAmount").value;
+      if (!window.ethereum) return alert("Installez Metamask !");
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const token = new ethers.Contract(tokenAddress, tokenABI, signer);
+      const vendor = new ethers.Contract(vendorAddress, vendorABI, signer);
+
+      const decimals = await token.decimals();
+      const amount = ethers.utils.parseUnits(cdfAmount, decimals);
+
+      const approval = await token.approve(vendorAddress, amount);
+      await approval.wait();
+
+      const tx = await vendor.sellTokens(amount);
+      alert("CDF vendu ! Tx: " + tx.hash);
+    }
+  </script>
+</body>
+</html>
